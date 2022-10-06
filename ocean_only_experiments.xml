@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!-- FRE Usage documentation: http://www.gfdl.noaa.gov/fms/fre -->
+<!--
+Quick start guide
+This xml consists of ocean only examples with MOM6.
+
+module load fre/bronx-19
+fremake -x ocean_only_experiments.xml -p ncrc4.intel18 -t prod MOM6_compile
+frerun -t prod -p ncrc4.intel18 -x ocean_only_experiments.xml Phillips_2layers_example
+-->
+
+<experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <property name="FRE_VERSION"     value="bronx-19"/>                     <!-- fre version to be used -->
+
+  <property name="RELEASE"      value="2021.03"/>                         <!-- git tag for general component source code-->
+  <property name="FMS_GIT_TAG"  value="$(RELEASE)"/>                      <!-- git tag for shared source code -->
+  <property name="MOM6_DATE"    value="20221006"/>                        <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_TAG" value="dev/gfdl"/>                        <!-- git tag for MOM6 source code -->
+  <property name="FRE_STEM"     value="FMS$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+
+  <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
+  <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
+  <property name="PROD_SIMTIME"   value="1"/>
+
+  <!-- this needs to exist for FRE, not used here -->
+  <property name="DEBUGLEVEL" value=""/>
+  <property name="BUILD_DATE" value=""/> 
+  <property name="PLATINFO" value=""/> 
+  <property name="AWG_INPUT_HOME_GAEA"  value=""/>
+  <property name="AWG_INPUT_HOME_GFDL"  value=""/>
+  <property name="append_to_setup_csh"  value=""/>
+
+  <!-- HPC platforms -->
+  <setup>
+    <xi:include href="platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel18'])"/>
+    <xi:include href="platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc3.intel18'])"/>
+    <xi:include href="platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc4-intel18'])"/>
+  </setup>
+
+  <!-- job ressources -->
+  <freInclude name="resourceparams_1node">
+           <resources jobWallclock="1:00:00"  segRuntime="1:00:00">
+             <ocn ranks="36" layout = "6,6"   io_layout = "1,1" mask_table="" threads="1"/>
+           </resources>
+  </freInclude>
+
+
+<!--****************************************************************************************-->
+<!--*****************************          COMPILE              ****************************-->
+<!--****************************************************************************************-->
+
+  <xi:include href="compile_ocean_only.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_compile'])"/>  
+
+
+<!--****************************************************************************************-->
+<!--*****************************     ocean only experiments    ****************************-->
+<!--****************************************************************************************-->
+
+  <experiment name="Phillips_2layers_example" inherit="MOM6_compile">
+    <description>
+Phillips 2-layer model, from MOM6-examples
+    </description>
+    <input>
+
+       <!-- namelists -->
+       <namelist name="MOM_input_nml">
+         output_directory = './',
+         input_filename = 'n',
+         restart_input_dir = 'INPUT/',
+         restart_output_dir = 'RESTART/',
+         parameter_filename = 'INPUT/MOM_input',
+                              'INPUT/MOM_override',
+       </namelist>
+
+       <namelist name="diag_manager_nml">
+       </namelist>
+  
+       <namelist name="fms_nml">
+         domains_stack_size = 710000,
+         stack_size = 0,
+       </namelist>
+  
+       <namelist name="ocean_solo_nml">
+         date_init = 1,1,1,0,0,0,
+         calendar = 'julian',
+         months = 2,
+         days = 0,
+       </namelist>
+  
+       <!-- input files -->
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ocean_only/Phillips_2layer/MOM_input</dataSource>
+       </dataFile>
+  
+       <!-- diagnostics -->
+       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ocean_only/Phillips_2layer/diag_table</dataSource>
+       </dataFile>
+
+       <!--MOM_overrides-->
+       <csh>
+        <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override DT = 300.0
+#override DT_THERM = 300.0
+MOM_OVERRIDE_EOF
+     ]]></csh>
+
+    </input>
+
+    <runtime>
+      <production simTime="$(PROD_SIMTIME)" units="years">
+          <segment simTime="12" units="months"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_1node']/node())"/>
+      </production>
+    </runtime>
+
+  </experiment>
+
+</experimentSuite>

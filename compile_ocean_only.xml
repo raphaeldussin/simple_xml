@@ -1,0 +1,28 @@
+<freInclude xmlns:xi="http://www.w3.org/2003/XInclude">
+
+   <experiment name="MOM6_compile">
+      <description>
+Make the executable for ocean-ice experiments.
+      </description>
+    <component name="fms" paths="FMS">
+      <source versionControl="git" root="https://github.com/NOAA-GFDL">
+            <codeBase version="$(FMS_GIT_TAG)"> FMS.git </codeBase>
+      </source>
+      <compile>
+            <cppDefs>-Duse_libMPI -Duse_netCDF $(F2003_FLAGS) -DMAXFIELDMETHODS_=400</cppDefs>
+      </compile>
+    </component>
+
+    <component name="mom6" requires="fms" paths="MOM6/{config_src/infra/FMS1,config_src/memory/dynamic_symmetric,config_src/drivers/solo_driver,config_src/external,src/{*,*/*}}/ ">
+      <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
+       <source versionControl="git" root="https://github.com/NOAA-GFDL">
+        <codeBase version="$(MOM6_GIT_TAG)">MOM6.git </codeBase>
+      </source>
+      <compile>
+        <cppDefs><![CDATA[ $(F2003_FLAGS) -DMAX_FIELDS_=100 -DNOT_SET_AFFINITY -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER  -DUSE_PRECISION=2 -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
+      </compile>
+    </component>
+      
+   </experiment>
+
+</freInclude>
