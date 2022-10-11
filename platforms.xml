@@ -102,7 +102,7 @@
         module load git
         setenv FREVERSION fre/$(FRE_VERSION)           
         setenv NBROOT $(NB_ROOT)
-        /home/Niki.Zadeh/nnz_tools/bin/verify -m $(MOM6_GIT_TAG) -x RTS
+        #/home/Niki.Zadeh/nnz_tools/bin/verify -m $(MOM6_GIT_HASH) -x RTS
       ]]>
       </csh>
     </platform>

@@ -14,15 +14,20 @@ frerun -t prod -p ncrc4.intel18 -x ice_ocean_experiments.xml Baltic_025_example
   <property name="FRE_VERSION"     value="bronx-19"/>                     <!-- fre version to be used -->
 
   <property name="RELEASE"       value="2021.03"/>                         <!-- git tag for general component source code-->
-  <property name="FMS_GIT_TAG"   value="$(RELEASE)"/>                      <!-- git tag for shared source code -->
+  <property name="FMS_TAG"       value="$(RELEASE)"/>                      <!-- git tag for shared source code -->
   <property name="COUPLER_TAG"   value="2020.02"/>                         <!-- git tag for coupler source code -->
-  <property name="MOM6_DATE"     value="20221006"/>                        <!-- git tag date for MOM6 source code -->
-  <property name="SIS_GIT_TAG"   value="c565ec3"/>                         <!-- git tag for SIS2 source code -->
-  <property name="ICEB_GIT_TAG"  value="0908ff0"/>                         <!-- git tag for icebergs source code -->
-  <property name="ICEPA_GIT_TAG" value="ddedca7"/>                         <!-- git tag for ice_param source code -->
   <property name="NULL_TAG"      value="master"/>                          <!-- git tag for null source code -->
-  <property name="MOM6_GIT_TAG"  value="5201c34"/>                         <!-- git tag for MOM6 source code -->
+  <property name="MOM6_DATE"     value="20221006"/>                        <!-- git tag date for MOM6 source code -->
   <property name="FRE_STEM"      value="FMS$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+
+  <property name="FMS_GIT_HASH"       value="f61416f"/>                    <!-- git tag for shared source code -->
+  <property name="COUPLER_GIT_HASH"   value="14578f0"/>                    <!-- git tag for coupler source code -->
+  <property name="SIS_GIT_HASH"       value="c565ec3"/>                    <!-- git tag for SIS2 source code -->
+  <property name="ICEB_GIT_HASH"      value="0908ff0"/>                    <!-- git tag for icebergs source code -->
+  <property name="ICEPA_GIT_HASH"     value="ddedca7"/>                    <!-- git tag for ice_param source code -->
+  <property name="MOM6_GIT_HASH"      value="5201c34"/>                    <!-- git tag for MOM6 source code -->
+  <property name="LAND_GIT_HASH"      value="49b089e"/>                    <!-- git tag for MOM6 source code -->
+  <property name="ATMOS_GIT_HASH"     value="aeac506"/>                    <!-- git tag for MOM6 source code -->
 
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
@@ -207,12 +212,6 @@ Baltic cutout from OM4_025, from MOM6-examples
        <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
         <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/SIS_input</dataSource>
        </dataFile>
-       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/data_table</dataSource>
-       </dataFile>
-       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
-        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/field_table</dataSource>
-       </dataFile>
   
        <!-- input data files -->
        <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
@@ -300,6 +299,14 @@ Baltic cutout from OM4_025, from MOM6-examples
         <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/WOA05_pottemp_salt.nc</dataSource>
        </dataFile>
 
+       <!-- special files -->
+       <dataFile label="dataTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/data_table</dataSource>
+       </dataFile>
+       <dataFile label="fieldTable" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/field_table</dataSource>
+       </dataFile>
+
        <!-- diagnostics -->
        <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/diag_table</dataSource>
@@ -309,16 +316,16 @@ Baltic cutout from OM4_025, from MOM6-examples
        <csh>
         <![CDATA[
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override LAYOUT = 6, 6
-#override IO_LAYOUT = 1, 1 
+!#override LAYOUT = 6, 6
+!#override IO_LAYOUT = 1, 1 
 !#override DT = 900.0
 !#override DT_THERM = 3600.0
 #override TOPO_FILE = ocean_topog.nc
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
-#override LAYOUT = 6, 6
-#override IO_LAYOUT = 1, 1 
+!#override LAYOUT = 6, 6
+!#override IO_LAYOUT = 1, 1 
 #override TOPO_FILE = ocean_topog.nc
 SIS_OVERRIDE_EOF
      ]]></csh>

@@ -103,8 +103,11 @@ Phillips 2-layer model, from MOM6-examples
        <csh>
         <![CDATA[
 cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
-#override DT = 300.0
-#override DT_THERM = 300.0
+#override DT = 3600.
+#override DAYMAX = 100.
+#override KHTH = 0.
+#override RESOLN_SCALED_KH = False
+VELOCITY_IC_PERTURB_AMP = 1.0
 MOM_OVERRIDE_EOF
      ]]></csh>
 
