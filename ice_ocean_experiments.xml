@@ -1,0 +1,337 @@
+<?xml version="1.0"?>
+<!-- FRE Usage documentation: http://www.gfdl.noaa.gov/fms/fre -->
+<!--
+Quick start guide
+This xml consists of ocean only examples with MOM6.
+
+module load fre/bronx-19
+fremake -x ice_ocean_experiments.xml -p ncrc4.intel18 -t prod MOM6_SIS2_compile
+frerun -t prod -p ncrc4.intel18 -x ice_ocean_experiments.xml Baltic_025_example
+-->
+
+<experimentSuite rtsVersion="4" xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <property name="FRE_VERSION"     value="bronx-19"/>                     <!-- fre version to be used -->
+
+  <property name="RELEASE"       value="2021.03"/>                         <!-- git tag for general component source code-->
+  <property name="FMS_GIT_TAG"   value="$(RELEASE)"/>                      <!-- git tag for shared source code -->
+  <property name="COUPLER_TAG"   value="2020.02"/>                         <!-- git tag for coupler source code -->
+  <property name="MOM6_DATE"     value="20221006"/>                        <!-- git tag date for MOM6 source code -->
+  <property name="SIS_GIT_TAG"   value="c565ec3"/>                         <!-- git tag for SIS2 source code -->
+  <property name="ICEB_GIT_TAG"  value="0908ff0"/>                         <!-- git tag for icebergs source code -->
+  <property name="ICEPA_GIT_TAG" value="ddedca7"/>                         <!-- git tag for ice_param source code -->
+  <property name="NULL_TAG"      value="master"/>                          <!-- git tag for null source code -->
+  <property name="MOM6_GIT_TAG"  value="5201c34"/>                         <!-- git tag for MOM6 source code -->
+  <property name="FRE_STEM"      value="FMS$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+
+  <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
+  <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->
+  <!--Production run properties. Users can modify these according to their need and/or performance analysis-->
+  <property name="PROD_SIMTIME"   value="1"/>
+
+  <!-- this needs to exist for FRE, not used here -->
+  <property name="DEBUGLEVEL" value=""/>
+  <property name="BUILD_DATE" value=""/> 
+  <property name="PLATINFO" value=""/> 
+  <property name="AWG_INPUT_HOME_GAEA"  value=""/>
+  <property name="AWG_INPUT_HOME_GFDL"  value=""/>
+  <property name="append_to_setup_csh"  value=""/>
+
+  <!-- HPC platforms -->
+  <setup>
+    <xi:include href="platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc4.intel18'])"/>
+    <xi:include href="platforms.xml" xpointer="xpointer(//freInclude/platform[@name='ncrc3.intel18'])"/>
+    <xi:include href="platforms.xml" xpointer="xpointer(//freInclude/platform[@name='gfdl.ncrc4-intel18'])"/>
+  </setup>
+
+  <!-- job ressources -->
+  <freInclude name="resourceparams_1node">
+           <resources jobWallclock="1:00:00"  segRuntime="1:00:00">
+             <ocn ranks="36" layout = "6,6"   io_layout = "1,1" mask_table="" threads="1"/>
+           </resources>
+  </freInclude>
+
+
+<!--****************************************************************************************-->
+<!--*****************************          COMPILE              ****************************-->
+<!--****************************************************************************************-->
+
+  <property name="LIBS_ROOT" value="MOM6_SIS2_compile"/>
+  <xi:include href="compile_ice_ocean.xml" xpointer="xpointer(//freInclude/experiment[@name='MOM6_SIS2_compile'])"/>  
+
+
+<!--****************************************************************************************-->
+<!--*****************************     ocean only experiments    ****************************-->
+<!--****************************************************************************************-->
+
+  <experiment name="Baltic_025_example" inherit="MOM6_SIS2_compile">
+    <description>
+Baltic cutout from OM4_025, from MOM6-examples
+    </description>
+    <input>
+
+       <!-- namelists blocks from input.nml -->
+       <namelist name="MOM_input_nml">
+            output_directory = '.',
+            input_filename = 'n',
+            restart_input_dir = 'INPUT',
+            restart_output_dir = 'RESTART',
+            parameter_filename = 'INPUT/MOM_input',
+                                 'INPUT/MOM_saltrestore',
+                                 'INPUT/MOM_override',
+       </namelist>
+
+       <namelist name="SIS_input_nml">
+            output_directory = './',
+            input_filename = 'n',
+            restart_input_dir = 'INPUT/',
+            restart_output_dir = 'RESTART/',
+            parameter_filename = 'INPUT/SIS_input',
+                                 'INPUT/SIS_override',
+       </namelist>
+
+       <namelist name="atmos_model_nml">
+            layout = 0, 0
+       </namelist>
+
+       <namelist name="coupler_nml">
+            months = 0,
+            days   = 2,
+            hours  = 0,
+            current_date = 1900,1,1,0,0,0,
+            calendar = 'NOLEAP',
+            dt_cpld = 1800,
+            dt_atmos = 1800,
+            do_atmos = .false.,
+            do_land = .false.,
+            do_ice = .true.,
+            do_ocean = .true.,
+            do_flux = .true.,
+            atmos_npes = 0,
+            concurrent = .false.,
+            use_lag_fluxes=.false.,
+            check_stocks = 0,
+       </namelist>
+
+       <namelist name="diag_manager_nml">
+            max_axes = 100,
+            max_files = 63,
+            max_num_axis_sets = 100,
+            max_input_fields = 699,
+            max_output_fields = 699,
+            mix_snapshot_average_fields=.false.,
+       </namelist>
+
+       <namelist name="flux_exchange_nml">
+            debug_stocks = .FALSE.,
+            divert_stocks_report = .TRUE.,
+            do_area_weighted_flux = .FALSE.,
+       </namelist>
+
+       <namelist name="fms_io_nml">
+            fms_netcdf_restart=.true.,
+            threading_read='multi',
+            max_files_r = 200,
+            max_files_w = 200,
+            checksum_required = .false.,
+       </namelist>
+
+       <namelist name="fms_nml">
+            clock_grain='ROUTINE',
+            clock_flags='NONE',
+            domains_stack_size = 5000000,
+            stack_size =0,
+       </namelist>
+
+       <namelist name="ice_albedo_nml">
+            t_range = 10.
+       </namelist>
+
+       <namelist name="ice_model_nml">
+       </namelist>
+
+       <namelist name="icebergs_nml">
+            verbose=.false.,
+            verbose_hrs=24,
+            traj_sample_hrs=24,
+            debug=.false.,
+            really_debug=.false.,
+            use_slow_find=.true.,
+            add_weight_to_ocean=.true.,
+            passive_mode=.false.,
+            generate_test_icebergs=.false.,
+            speed_limit=0.,
+            use_roundoff_fix=.true.,
+            make_calving_reproduce=.true.,
+       </namelist>
+
+       <namelist name="monin_obukhov_nml">
+            neutral = .true.
+       </namelist>
+
+       <namelist name="ocean_albedo_nml">
+            ocean_albedo_option = 2
+       </namelist>
+
+       <namelist name="ocean_rough_nml">
+            rough_scheme = 'beljaars'
+       </namelist>
+
+       <namelist name="sat_vapor_pres_nml">
+            construct_table_wrt_liq = .true.
+            construct_table_wrt_liq_and_ice = .true.
+       </namelist>
+
+       <namelist name="surface_flux_nml">
+            ncar_ocean_flux = .true.
+	    raoult_sat_vap = .true.
+       </namelist>
+
+       <namelist name="topography_nml">
+            topog_file = 'INPUT/navy_topography.data.nc'
+       </namelist>
+
+       <namelist name="xgrid_nml">
+            make_exchange_reproduce = .false.
+            interp_method = 'second_order'
+       </namelist>
+
+
+       <!-- input parameters files -->
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/MOM_input</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/MOM_saltrestore</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/SIS_input</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/data_table</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/field_table</dataSource>
+       </dataFile>
+  
+       <!-- input data files -->
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/analysis_vgrid_lev35.v1.cdl</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/analysis_vgrid_lev35.v1.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/atmos_mosaic_tile1Xland_mosaic_tile1.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/atmos_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/geothermal_davies2013_v1.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/grid_spec.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/hycom1_75_800m.cdl</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/hycom1_75_800m.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/land_mask.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/land_mosaic_tile1Xocean_mosaic_tile1.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/layer_coord.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/MOM_channels_global_025</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/ncar_precip.clim.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/ncar_rad.clim.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/ocean_hgrid.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/ocean_mask.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/ocean_mosaic.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/ocean_topog.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/q_10_mod.clim.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/runoff.daitren.clim.v2011.02.10a.1440x1080.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/salt_restore.v20140616.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/seawifs_1998-2006_smoothed_2X.v20140616.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/slp.clim.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/t_10_mod.clim.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/tidal_amplitude.v20140616.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/u_10_mod.clim.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/v_10_mod.clim.nc</dataSource>
+       </dataFile>
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/INPUT/WOA05_pottemp_salt.nc</dataSource>
+       </dataFile>
+
+       <!-- diagnostics -->
+       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+         <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/diag_table</dataSource>
+       </dataFile>
+
+       <!--MOM_overrides-->
+       <csh>
+        <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override LAYOUT = 6, 6
+#override IO_LAYOUT = 1, 1 
+!#override DT = 900.0
+!#override DT_THERM = 3600.0
+#override TOPO_FILE = ocean_topog.nc
+MOM_OVERRIDE_EOF
+
+cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
+#override LAYOUT = 6, 6
+#override IO_LAYOUT = 1, 1 
+#override TOPO_FILE = ocean_topog.nc
+SIS_OVERRIDE_EOF
+     ]]></csh>
+
+    </input>
+
+    <runtime>
+      <production simTime="$(PROD_SIMTIME)" units="years">
+          <segment simTime="12" units="months"/>
+          <xi:include xpointer="xpointer(//freInclude[@name='resourceparams_1node']/node())"/>
+      </production>
+    </runtime>
+
+  </experiment>
+
+</experimentSuite>
