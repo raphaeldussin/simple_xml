@@ -40,3 +40,9 @@ frerun -x ice_ocean_experiments.xml -t prod -p ncrc4.intel18 Baltic_025_example
 copy the **MOM_override** into the new **<input>** of the xml and make it a f-plane
 experiment (i.e. BETA = 0.)
 
+2. edit the Baltic example and replace the current diag_table by your own, in which you
+will save daily output for SST (tos), SSS (sos)
+
+3. the Baltic sea has a maximum depth of 500 meters, build a custom **diagnostic** vertical
+coordinate with 5 meters resolution from the surface to 100 meters and 25 meters below 100 meters.
+Add this new coordinate to the **DIAG_COORDS** and add thetao and so to the diag_table.
