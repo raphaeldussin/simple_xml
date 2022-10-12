@@ -43,6 +43,46 @@ experiment (i.e. BETA = 0.)
 2. edit the Baltic example and replace the current diag_table by your own, in which you
 will save daily output for SST (tos), SSS (sos)
 
-3. the Baltic sea has a maximum depth of 500 meters, build a custom **diagnostic** vertical
-coordinate with 5 meters resolution from the surface to 100 meters and 25 meters below 100 meters.
+3. the Baltic sea has a maximum depth of 500 meters, finish the code snippet to build a custom
+**diagnostic** vertical coordinate with 5 meters resolution from the surface to 100 meters and 
+25 meters below 100 meters.
+
+```python
+mport numpy as np
+import xarray as xr
+
+
+interfaces = 
+
+thicknesses = 
+
+# define netcdf variables and write to file
+vertcoord = xr.Dataset()
+
+vertcoord["z_i"] = xr.DataArray(interfaces,
+                                dims=("z_i"),
+                                attrs={"long_name": "Interface target depth",
+                                       "units": "m"})
+vertcoord["dz"] = xr.DataArray(thicknesses,
+                               dims=("z_l"),
+                               attrs={"long_name": "z* coordinate level thickness",
+                                       "units": "m"})
+
+vertcoord.to_netcdf("diag_z_baltic.nc", encoding={"z_i": {"_FillValue": 1e+20},
+                                                  "dz": {"_FillValue": 1e+20}})
+
+```
+
 Add this new coordinate to the **DIAG_COORDS** and add thetao and so to the diag_table.
+
+advice: you can use my python install
+
+```
+alias ipython=/lustre/f2/dev/Raphael.Dussin/miniconda3/envs/repro/bin/ipython
+```
+
+if you're having issues creating the file (or we're running out of time), use the one I already created:
+
+```
+/lustre/f2/dev/Raphael.Dussin/input/MOM6tutorial/Baltic/diag_z_baltic.nc
+```
