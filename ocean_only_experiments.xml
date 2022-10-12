@@ -122,4 +122,25 @@ MOM_OVERRIDE_EOF
 
   </experiment>
 
+  <experiment name="Phillips_2layers_fplane" inherit="Phillips_2layers_example">
+
+    <input>
+       <!--MOM_overrides-->
+       <csh>
+        <![CDATA[
+cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
+#override DT = 3600.
+#override DAYMAX = 100.
+#override KHTH = 0.
+#override RESOLN_SCALED_KH = False
+VELOCITY_IC_PERTURB_AMP = 1.0
+#override BETA = 0.
+MOM_OVERRIDE_EOF
+     ]]></csh>
+
+    </input>
+
+  </experiment>
+
+
 </experimentSuite>

@@ -308,9 +308,29 @@ Baltic cutout from OM4_025, from MOM6-examples
        </dataFile>
 
        <!-- diagnostics -->
-       <dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
+       <!--dataFile label="diagTable" target="INPUT/" chksum="" size="" timestamp="">
          <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/MOM6-examples/ice_ocean_SIS2/Baltic_OM4_025/diag_table</dataSource>
+       </dataFile-->
+
+       <!-- add new input file -->
+       <dataFile label="input" target="INPUT/" chksum="" size="" timestamp="">
+        <dataSource platform="$(platform)">/lustre/f2/dev/Raphael.Dussin/input/MOM6tutorial/Baltic/diag_z_baltic.nc</dataSource>
        </dataFile>
+
+<diagTable>
+OM4_SIS2_cgrid_025
+0001 1 1 0 0 0
+
+"ocean_daily",   1, "days", 1, "days", "time"
+"ocean_daily_z", 1, "days", 1, "days", "time"
+
+"ocean_model",         "tos",    "tos",      "ocean_daily",         "all", "mean", "none",2
+"ocean_model",         "sos",    "sos",      "ocean_daily",         "all", "mean", "none",2
+
+"ocean_model_zbalt",   "thetao", "thetao",   "ocean_daily_z",       "all", "mean", "none",2
+"ocean_model_zbalt",   "so",     "so",       "ocean_daily_z",       "all", "mean", "none",2
+
+</diagTable>
 
        <!--MOM_overrides-->
        <csh>
@@ -321,6 +341,9 @@ cat > $work/INPUT/MOM_override << MOM_OVERRIDE_EOF
 !#override DT = 900.0
 !#override DT_THERM = 3600.0
 #override TOPO_FILE = ocean_topog.nc
+#override NUM_DIAG_COORDS = 1
+#override DIAG_COORDS = "zbalt ZBALTIC ZSTAR"
+#override DIAG_COORD_DEF_ZBALTIC = "FILE:diag_z_baltic.nc,interfaces=z_i"
 MOM_OVERRIDE_EOF
 
 cat > $work/INPUT/SIS_override << SIS_OVERRIDE_EOF
