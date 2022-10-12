@@ -13,11 +13,11 @@ frerun -t prod -p ncrc4.intel18 -x ocean_only_experiments.xml Phillips_2layers_e
 
   <property name="FRE_VERSION"     value="bronx-19"/>                     <!-- fre version to be used -->
 
-  <property name="RELEASE"      value="2021.03"/>                         <!-- git tag for general component source code-->
-  <property name="FMS_GIT_TAG"  value="$(RELEASE)"/>                      <!-- git tag for shared source code -->
-  <property name="MOM6_DATE"    value="20221006"/>                        <!-- git tag date for MOM6 source code -->
-  <property name="MOM6_GIT_TAG" value="dev/gfdl"/>                        <!-- git tag for MOM6 source code -->
-  <property name="FRE_STEM"     value="FMS$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
+  <property name="RELEASE"       value="2021.03"/>                         <!-- git tag for general component source code-->
+  <property name="FMS_GIT_TAG"   value="$(RELEASE)"/>                      <!-- git tag for shared source code -->
+  <property name="MOM6_DATE"     value="20221006"/>                        <!-- git tag date for MOM6 source code -->
+  <property name="MOM6_GIT_HASH" value="5201c34"/>                        <!-- git tag for MOM6 source code -->
+  <property name="FRE_STEM"      value="FMS$(RELEASE)_mom6_$(MOM6_DATE)"/> <!-- customize as needed -->
 
   <!-- Please make sure to change "YOURGROUPLETTER" to your group, such as b, f, g, m, o... -->
   <property name="GFDL_GROUP"     value="gfdl_o"/><!-- Replace YOURGROUPLETTER with GFDL group letter -->

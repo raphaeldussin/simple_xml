@@ -14,9 +14,14 @@ Make the executable for ocean-ice experiments.
     </component>
 
     <component name="mom6" requires="fms" paths="MOM6/{config_src/infra/FMS1,config_src/memory/dynamic_symmetric,config_src/drivers/solo_driver,config_src/external,src/{*,*/*}}/ ">
-      <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="$(MOM6_GIT_TAG)" communityGrid="Tripolar"/>
+      <description domainName="Ocean" communityName="GFDL-MOM6" communityVersion="dev/gfdl" communityGrid="Tripolar"/>
        <source versionControl="git" root="https://github.com/NOAA-GFDL">
-        <codeBase version="$(MOM6_GIT_TAG)">MOM6.git </codeBase>
+        <codeBase version="dev/gfdl">MOM6.git </codeBase>
+        <csh><![CDATA[
+               pushd MOM6
+               git checkout $(MOM6_GIT_HASH)
+               popd
+       ]]></csh>
       </source>
       <compile>
         <cppDefs><![CDATA[ $(F2003_FLAGS) -DMAX_FIELDS_=100 -DNOT_SET_AFFINITY -D_USE_MOM6_DIAG -D_USE_GENERIC_TRACER  -DUSE_PRECISION=2 -D_FILE_VERSION="'"`git-version-string $<`"'" ]]></cppDefs>
