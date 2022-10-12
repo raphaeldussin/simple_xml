@@ -3,6 +3,17 @@
 This repo is used as a starting point for tutorials but feel free to use it as a template
 for ocean_only or ice_ocean configurations.
 
+## Installation
+
+quick and dirty way:
+
+```
+git clone https://github.com/raphaeldussin/simple_xml.git
+```
+
+If you're confortable with git, you can also create your own repo by clicking *use as template*
+and populate it with your own xmls.
+
 ## Compile and run the examples:
 
 ### Phillips 2 layers
