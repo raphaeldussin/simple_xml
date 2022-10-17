@@ -48,7 +48,7 @@ will save daily output for SST (tos), SSS (sos)
 25 meters below 100 meters.
 
 ```python
-mport numpy as np
+import numpy as np
 import xarray as xr
 
 
