@@ -14,6 +14,13 @@ git clone https://github.com/raphaeldussin/simple_xml.git
 If you're confortable with git, you can also create your own repo by clicking *use as template*
 and populate it with your own xmls.
 
+
+## Slides
+
+Slides from the 2022 MOM6 tutorial are in the TutoMOM6_FRE pdf file.
+Companion video is available on the [MOM6 youtube channel](https://www.youtube.com/channel/UCKygVh-QqjYhcW2IbliWsUg/videos)
+
+
 ## Compile and run the examples:
 
 ### Phillips 2 layers
@@ -44,7 +51,7 @@ experiment (i.e. BETA = 0.)
 will save daily output for SST (tos), SSS (sos)
 
 3. the Baltic sea has a maximum depth of 500 meters, finish the code snippet to build a custom
-**diagnostic** vertical coordinate with 5 meters resolution from the surface to 100 meters and 
+**diagnostic** vertical coordinate with 5 meters resolution from the surface to 100 meters and
 25 meters below 100 meters.
 
 ```python
@@ -52,9 +59,9 @@ import numpy as np
 import xarray as xr
 
 
-interfaces = 
+interfaces =
 
-thicknesses = 
+thicknesses =
 
 # define netcdf variables and write to file
 vertcoord = xr.Dataset()
